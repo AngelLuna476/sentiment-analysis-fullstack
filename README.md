@@ -180,7 +180,7 @@ Se utilizó `class_weight='balanced'` en el modelo para manejar el desbalanceo.
 
 ### 1️⃣ Clonar el Repositorio
 ```bash
-git clone https://github.com/tu-usuario/sentiment-analysis-fullstack.git
+git clone https://github.com/AngelLuna476/sentiment-analysis-fullstack.git
 cd sentiment-analysis-fullstack
 ```
 
@@ -489,7 +489,7 @@ Estadísticas de uso.
 
 ### 🐛 Reportar Bugs
 
-Si encuentras un bug, por favor [abre un issue](https://github.com/tu-usuario/sentiment-analysis-fullstack/issues) con:
+Si encuentras un bug, por favor [abre un issue](https://github.com/AngelLuna476/sentiment-analysis-fullstack/issues) con:
 - Descripción del problema
 - Pasos para reproducirlo
 - Comportamiento esperado vs real
