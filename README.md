@@ -293,8 +293,8 @@ texto
 ### 🏠 Pantalla Principal - Análisis Individual
 ```
 <div align="center">
-  <img src="https://github.com/AngelLuna476/sentiment-analysis-fullstack/blob/main/docs/imagenes/demo-analisis.gif?raw=true" alt="Demo Batch" width="80%">
-  <p><i>Procesamiento de múltiples textos desde archivo CSV</i></p>
+  <img src="docs/imagenes/demo-analisis.gif" alt="Demo Análisis" width="80%">
+  <p><i>Descripción de la imagen</i></p>
 </div>
 
 
