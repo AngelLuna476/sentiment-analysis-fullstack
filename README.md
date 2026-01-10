@@ -336,14 +336,15 @@ texto
 
 
 ---
-### 📝 Análisis Multilingue - Ejemplo inglés / portugués
+### 📝 Análisis Multilingue - Ejemplo inglés
 
 <div align="center">
   <img src="docs/imagenes/demo-multilingue-ingles.gif" alt="Análisis Inglés" width="80%">
   <p><i>Análisis de sentimiento en inglés en tiempo real con resultado instantáneo</i></p>
 </div>
 
-<br>
+---
+### 📝 Análisis Multilingue - Ejemplo portugués
 
 <div align="center">
   <img src="docs/imagenes/demo-multilingue-portugues.gif" alt="Análisis Portugués" width="80%">
