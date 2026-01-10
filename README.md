@@ -292,8 +292,10 @@ texto
 
 ### 🏠 Pantalla Principal - Análisis Individual
 ```
-![Demo Análisis Individual](sentiment-analysis-fullstack/docs/imagenes
-/demo-analisis.gif)
+<div align="center">
+  <img src="sentiment-analysis-fullstack/docs/imagenes/demo-analisis.gif" alt="Demo Batch" width="80%">
+  <p><i>Procesamiento de múltiples textos desde archivo CSV</i></p>
+</div>
 
 
 ```
