@@ -289,7 +289,7 @@ texto
 ---
 
 ## 📸 Screenshots
-
+---
 ### 🏠 Pantalla Principal - Análisis Individual
 
 <div align="center">
@@ -298,46 +298,46 @@ texto
 </div>
 
 
-```
+---
 
 ### 📦 Análisis Batch con Resultados
-```
+
 <div align="center">
   <img src="docs/imagenes/demo-batch.gif" alt="Demo Batch" width="80%">
   <p><i>Procesamiento de múltiples textos desde archivo CSV</i></p>
 </div>
 
-```
 
+---
 ### 🔍 Explicabilidad - Palabras Influyentes
-```
+
 <div align="center">
   <img src="docs/imagenes/demo-explicabilidad.gif" alt="Demo Explicabilidad" width="80%">
   <p><i>Visualización de palabras más influyentes en la decisión del modelo</i></p>
 </div>
 
-```
 
+---
 ### 📊 Dashboard de Estadísticas
-```
+
 <div align="center">
   <img src="docs/imagenes/demo-estadisticas.gif" alt="Dashboard Estadísticas" width="80%">
   <p><i>Dashboard con métricas de uso y gráfico de pastel</i></p>
 </div>
 
-```
 
+---
 ### 🔄 Comparador - Threshold
-```
+
 <div align="center">
   <img src="docs/imagenes/demo-comparador.gif" alt="Dashboard Estadísticas" width="80%">
   <p><i>Análisis de sentimiento en tiempo real con diferente Threshold</i></p>
 </div>
 
-```
 
+---
 ### 📝 Análisis Multilingue - Ejemplo inglés / portugués
-```
+
 <div align="center">
   <img src="docs/imagenes/demo-multilingue-ingles.gif" alt="Análisis Inglés" width="80%">
   <p><i>Análisis de sentimiento en inglés en tiempo real con resultado instantáneo</i></p>
@@ -350,7 +350,7 @@ texto
   <p><i>Análisis de sentimiento en portugués tiempo real con resultado instantáneo</i></p>
 </div>
 
-```
+
 ---
 
 ## 🔌 API Endpoints
