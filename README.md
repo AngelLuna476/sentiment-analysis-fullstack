@@ -292,7 +292,8 @@ texto
 
 ### 🏠 Pantalla Principal - Análisis Individual
 ```
-![Demo Análisis Individual](docs/imagenes/demo-analisis.gif)
+![Demo Análisis Individual](sentiment-analysis-fullstack/docs/imagenes
+/demo-analisis.gif)
 
 
 ```
