@@ -10,7 +10,7 @@
 
 **Sistema completo de análisis de sentimientos en tiempo real usando Machine Learning y arquitectura de microservicios.**
 
-[🌐 Demo en Vivo](#) | [📚 Documentación](#instalación) | [🐛 Reportar Bug](https://github.com/tu-usuario/sentiment-analysis-fullstack/issues)
+[🌐 Demo en Vivo](#) | [📚 Documentación](#instalación) | [🐛 Reportar Bug](https://github.com/AngelLuna476/sentiment-analysis-fullstack/issues)
 
 </div>
 
