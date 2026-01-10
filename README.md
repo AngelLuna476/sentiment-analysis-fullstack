@@ -9,6 +9,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 
 **Sistema completo de análisis de sentimientos en tiempo real usando Machine Learning y arquitectura de microservicios.**
+<br>
 _Propuesta de solución desarrollada para el Hackathon ONE II - Latam_
 
 [🌐 Demo en Vivo](#) | [📚 Documentación](#instalación) | [🐛 Reportar Bug](https://github.com/AngelLuna476/sentiment-analysis-fullstack/issues)
