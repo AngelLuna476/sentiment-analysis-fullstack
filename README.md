@@ -1,4 +1,4 @@
-# 🎯 Sentiment Analysis API - Fullstack Project
+# 🎯 Sentiment Analysis Multilingual API - Full Stack Project
 
 <div align="center">
 
