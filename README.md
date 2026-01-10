@@ -347,6 +347,7 @@ texto
   <p><i>Análisis de sentimiento en portugués tiempo real con resultado instantáneo</i></p>
 </div>
 
+```
 ---
 
 ## 🔌 API Endpoints
