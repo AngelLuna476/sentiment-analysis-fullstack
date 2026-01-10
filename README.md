@@ -348,7 +348,7 @@ texto
 
 <div align="center">
   <img src="docs/imagenes/demo-multilingue-portugues.gif" alt="Análisis Portugués" width="80%">
-  <p><i>Análisis de sentimiento en portugués tiempo real con resultado instantáneo</i></p>
+  <p><i>Análisis de sentimiento en portugués en tiempo real con resultado instantáneo</i></p>
 </div>
 
 
