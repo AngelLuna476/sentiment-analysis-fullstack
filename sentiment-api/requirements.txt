@@ -1,0 +1,25 @@
+# ============================================
+# DEPENDENCIAS - API PYTHON (FASTAPI)
+# ============================================
+
+# Framework Web
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Validación de datos
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Machine Learning (versiones con wheels precompilados)
+scikit-learn>=1.5.0
+joblib>=1.4.0
+
+# Traducción
+googletrans==4.0.0-rc1
+
+# Utilidades
+python-dotenv==1.0.0
+
+# Opcional - Para deployment
+gunicorn==21.2.0

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis - Análisis de Sentimientos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="emoji">🎯</span>
+                <h1>SENTIMENT<span class="highlight">API</span></h1>
+            </div>
+            <p class="subtitle">Análisis de sentimientos con Inteligencia Artificial</p>
+            <!-- Navegación con tabs -->
+            <nav class="main-nav">
+                <button class="nav-btn active" data-section="analizar">
+                    📝 Analizar
+                </button>
+                <button class="nav-btn" data-section="estadisticas">
+                    📊 Estadísticas
+                </button>
+                <button class="nav-btn" data-section="historial">
+                    📜 Historial
+                </button>
+                <button class="nav-btn" data-section="comparador">
+                    🔄 Comparador
+                </button>
+                <button class="nav-btn" data-section="explicabilidad">
+                    🔍 Explicabilidad
+                </button>
+                <button class="nav-btn" data-section="batch">
+                    📦 Análisis Batch
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Section: Analizar -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>📝 ANALIZAR</h2>
+                    <p>Selecciona la forma que desea analizar</p>
+                </div>
+
+                <div class="card-body">
+                    <!-- Tipo de análisis -->
+                    <div class="form-group">
+                        <label class="form-label">Primero, selecciona el tipo:</label>
+                        <select id="tipoAnalisis" class="form-select">
+                            <option value="individual">Individual</option>
+                            <option value="batch">Masivo</option>
+                            <option value="comparator">Comparador</option>
+                        </select>
+                    </div>
+
+                    <!-- Área de texto -->
+                    <div class="form-group">
+                        <label class="form-label">Segundo, ingresa el comentario:</label>
+                        <textarea 
+                            id="comentario" 
+                            class="form-textarea"
+                            placeholder="Ej. Este hotel es excelente, me encantó la habitación y el servicio..."
+                            rows="5"
+                        ></textarea>
+                        <div class="char-count">
+                            <span id="charCount">0</span> / 5000 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Configuraciones avanzadas -->
+                    <div class="advanced-options">
+                        <button class="toggle-advanced" id="toggleAdvanced">
+                            ⚙️ Opciones Avanzadas
+                            <span class="arrow">▼</span>
+                        </button>
+                        
+                        <div class="advanced-content" id="advancedContent">
+                            <!-- Selector de idioma -->
+                            <div class="form-group">
+                                <label class="form-label">Idioma del texto:</label>
+                                <select id="idioma" class="form-select">
+                                    <option value="auto">🌐 Detección automática</option>
+                                    <option value="es">🇪🇸 Español</option>
+                                    <option value="en">🇺🇸 Inglés</option>
+                                    <option value="pt">🇧🇷 Portugués</option>
+                                    <option value="fr">🇫🇷 Francés</option>
+                                    <option value="de">🇩🇪 Alemán</option>
+                                </select>
+                            </div>
+
+                            <!-- Threshold slider -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Umbral de decisión (Threshold):
+                                    <span class="threshold-value" id="thresholdDisplay">0.50</span>
+                                </label>
+                                <input 
+                                    type="range" 
+                                    id="threshold" 
+                                    class="form-range"
+                                    min="0.1" 
+                                    max="0.9" 
+                                    step="0.05" 
+                                    value="0.5"
+                                >
+                                <div class="threshold-labels">
+                                    <span>0.1 (Más positivos)</span>
+                                    <span>0.5 (Balanceado)</span>
+                                    <span>0.9 (Más negativos)</span>
+                                </div>
+                                <p class="threshold-info">
+                                    💡 <strong>Tip:</strong> Valores bajos clasifican más textos como positivos. 
+                                    Valores altos son más estrictos.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón analizar -->
+                    <button id="btnAnalizar" class="btn-primary">
+                        <span class="btn-text">ANALIZAR COMENTARIO</span>
+                        <span class="btn-loader" style="display: none;">
+                            <span class="spinner"></span>
+                            Analizando...
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Section: Resultados -->
+            <section class="card result-card" id="resultCard" style="display: none;">
+                <div class="card-header">
+                    <h2>📊 RESULTADO</h2>
+                    <p>Tercero, examina el resultado del análisis realizado</p>
+                </div>
+
+                <div class="card-body">
+                    <div class="result-content" id="resultContent">
+                        <!-- Resultado principal -->
+                        <div class="result-main">
+                            <div class="result-emoji" id="resultEmoji">😊</div>
+                            <div class="result-sentiment" id="resultSentiment">Positivo</div>
+                        </div>
+
+                        <!-- Métricas -->
+                        <div class="result-metrics">
+                            <div class="metric-card">
+                                <div class="metric-label">Probabilidad</div>
+                                <div class="metric-value" id="resultProbability">95.50%</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Confianza</div>
+                                <div class="metric-value" id="resultConfidence">Muy Alta</div>
+                            </div>
+                        </div>
+
+                        <!-- Texto analizado -->
+                        <div class="result-text">
+                            <h3>Texto analizado:</h3>
+                            <p id="resultText"></p>
+                        </div>
+
+                        <!-- Configuración usada -->
+                        <div class="result-config">
+                            <div class="config-item">
+                                <span class="config-label">Idioma:</span>
+                                <span class="config-value" id="resultIdioma">es</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Threshold:</span>
+                                <span class="config-value" id="resultThreshold">0.50</span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="result-actions">
+                            <button class="btn-secondary" id="btnGuardar">
+                                🔍 Ver Explicabilidad
+                            </button>
+                            <button class="btn-secondary" id="btnDescartar">
+                                🗑️ Descartar Análisis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Error -->
+            <section class="card error-card" id="errorCard" style="display: none;">
+                <div class="error-content">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Error al procesar la solicitud</h3>
+                    <p id="errorMessage"></p>
+                    <button class="btn-secondary" id="btnCerrarError">Cerrar</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Section: Estadísticas de Sesión -->
+        <section class="card stats-card" id="statsCard">
+            <div class="card-header">
+                <h2>📊 ESTADÍSTICAS DE SESIÓN</h2>
+                <p>Resumen de tus análisis individuales realizados</p>
+            </div>
+    
+            <div class="card-body">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total Analizados</div>
+                    </div>
+            
+                    <div class="stat-item positive">
+                        <div class="stat-icon">😊</div>
+                        <div class="stat-value" id="statPositivos">0</div>
+                        <div class="stat-label">Positivos</div>
+                    </div>
+            
+                    <div class="stat-item negative">
+                        <div class="stat-icon">😔</div>
+                        <div class="stat-value" id="statNegativos">0</div>
+                        <div class="stat-label">Negativos</div>
+                    </div>
+            
+                    <div class="stat-item">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-value" id="statPromedio">0%</div>
+                        <div class="stat-label">Confianza Promedio</div>
+                    </div>
+                </div>
+        
+                <div class="stats-chart">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Historial de Análisis -->
+        <section class="card history-card" id="historyCard" style="display: none;">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2>📜 HISTORIAL DE ANÁLISIS</h2>
+                        <p>Tus últimos análisis individuales realizados</p>
+                    </div>
+                    <button class="btn-secondary btn-small" id="btnLimpiarHistorial">
+                        🗑️ Limpiar Historial
+                    </button>
+                </div>
+            </div>
+    
+            <div class="card-body">
+                <div class="history-list" id="historyList">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+        
+                <div class="empty-history" id="emptyHistory">
+                    <p>📭 No hay análisis en el historial todavía.</p>
+                    <p>Realiza tu primer análisis para empezar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Comparador de Threshold -->
+        <section class="card comparator-card" id="comparatorCard" style="display: none;">
+            <div class="card-header">
+                <h2>🔄 COMPARADOR DE THRESHOLD</h2>
+                <p>Analiza el mismo texto con diferentes umbrales</p>
+            </div>
+    
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Texto a comparar:</label>
+                    <textarea 
+                        id="comparatorText" 
+                        class="form-textarea"
+                        placeholder="Escribe o pega un texto para comparar con diferentes thresholds..."
+                        rows="4"
+                    ></textarea>
+                </div>
+        
+                <button id="btnComparar" class="btn-primary">
+                    <span class="btn-text">COMPARAR THRESHOLDS</span>
+                    <span class="btn-loader" style="display: none;">
+                        <span class="spinner"></span>
+                        Analizando...
+                    </span>
+                </button>
+        
+                <div class="comparison-results" id="comparisonResults" style="display: none;">
+                    <h3>Resultados de la comparación:</h3>
+                    <div class="comparison-grid">
+                        <!-- Threshold 0.3 -->
+                        <div class="comparison-item">
+                            <div class="comparison-header">
+                                <span class="threshold-badge low">Threshold: 0.3</span>
+                                <span class="threshold-note">Más Positivos</span>
+                            </div>
+                            <div class="comparison-result" id="result_03">
+                                <div class="comp-sentiment">-</div>
+                                <div class="comp-probability">-</div>
+                            </div>
+                        </div>
+                
+                        <!-- Threshold 0.5 -->
+                        <div class="comparison-item">
+                                <div class="comparison-header">
+                                <span class="threshold-badge medium">Threshold: 0.5</span>
+                                <span class="threshold-note">Balanceado</span>
+                            </div>
+                            <div class="comparison-result" id="result_05">
+                                <div class="comp-sentiment">-</div>
+                                <div class="comp-probability">-</div>
+                            </div>
+                        </div>
+                
+                        <!-- Threshold 0.7 -->
+                        <div class="comparison-item">
+                            <div class="comparison-header">
+                                <span class="threshold-badge high">Threshold: 0.7</span>
+                                <span class="threshold-note">Más Negativos</span>
+                            </div>
+                            <div class="comparison-result" id="result_07">
+                                <div class="comp-sentiment">-</div>
+                                <div class="comp-probability">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Explicabilidad -->
+        <section class="card explain-card" id="explainCard" style="display: none;">
+            <div class="card-header">
+                <h2>🔍 EXPLICABILIDAD</h2>
+                <p>Palabras que más influyeron en la decisión individual</p>
+            </div>
+    
+            <div class="card-body">
+                <div class="explain-content" id="explainContent">
+                    <div class="explain-text" id="explainText">
+                        <!-- Se llenará con el texto resaltado -->
+                    </div>
+            
+                    <div class="top-words">
+                        <h3>🎯 Palabras más influyentes:</h3>
+                        <div class="words-grid" id="topWords">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Análisis Batch -->
+        <section class="card" id="batchCard" style="display: none;">
+            <div class="card-header">
+                <h2>📦 ANÁLISIS BATCH (CSV)</h2>
+                <p>Analiza múltiples textos desde un archivo CSV</p>
+            </div>
+    
+            <div class="card-body">
+                <!-- Upload CSV Mejorado -->
+                <div class="form-group">
+                    <label style="display: block; font-weight: 600; margin-bottom: 12px; color: #374151; font-size: 15px;">
+                        📄 Archivo CSV |
+                        <span class="tooltip" style="margin-left: 8px;">
+                            <span class="tooltip-text">
+                                El archivo debe tener una columna 'texto' con los comentarios para analizar
+                            </span>
+                        </span>
+                    </label>
+    
+                    <!-- Input de archivo personalizado -->
+                    <div class="file-input-wrapper">
+                        <input type="file" 
+                            id="csvFile" 
+                            accept=".csv"
+                            class="file-input-hidden">
+                        <button type="button" class="file-input-button" id="btnSelectFile">
+                            📁 Seleccionar archivo
+                        </button>
+                        <span class="file-input-name" id="fileName">Ningún archivo seleccionado</span>
+                    </div>
+    
+                    <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 12px 15px; border-radius: 8px; margin-top: 15px;">
+                        <p style="margin: 0; font-size: 13px; color: #1e40af; line-height: 1.5;">
+                            <strong>📋 Formato:</strong> archivo.csv con columna "texto"<br>
+                            <strong>📊 Máximo:</strong> 1000 filas
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Selector de idioma mejorado -->
+                <div class="form-group" style="margin-top: 25px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 12px; color: #374151; font-size: 15px;">
+                        🌍 Idioma del texto
+                    </label>
+    
+                    <div class="select-wrapper">
+                        <select id="batchIdioma" class="select-styled">
+                            <option value="auto">🔍 Detectar automáticamente</option>
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="en">🇬🇧 Inglés</option>
+                            <option value="pt">🇵🇹 Portugués</option>
+                            <option value="fr">🇫🇷 Francés</option>
+                            <option value="it">🇮🇹 Italiano</option>
+                            <option value="de">🇩🇪 Alemán</option>
+                        </select>
+                        <div class="select-arrow">▼</div>
+                    </div>
+                </div>
+
+                <!-- Botón -->
+                <button id="btnBatch" class="btn-primary">
+                    🚀 Analizar CSV
+                </button>
+
+                <!-- Loader con barra de progreso -->
+                <div id="batchLoader" style="display: none; text-align: center; padding: 40px 20px;">
+                    <!-- Contenedor de la barra -->
+                    <div style="max-width: 400px; margin: 0 auto;">
+                        <!-- Barra de progreso -->
+                        <div style="background: #e5e7eb; border-radius: 50px; overflow: hidden; height: 12px; margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                            <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 50px; transition: width 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);"></div>
+                        </div>
+        
+                        <!-- Mensaje -->
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 25px;">
+                            <div class="spinner" style="width: 24px; height: 24px; border-width: 3px;"></div>
+                            <p style="margin: 0; font-size: 16px; color: #374151; font-weight: 500;">
+                                Analizando archivos, por favor espere
+                            </p>
+                        </div>
+        
+                        <!-- Texto de progreso (oculto por defecto) -->
+                        <p id="batchProgress" style="margin-top: 15px; font-size: 13px; color: #6b7280; font-weight: 500;"></p>
+                    </div>
+                </div>
+
+                <!-- Resultados Batch -->
+                <div id="batchResults" style="display: none; margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>📊 Resultados del Análisis</h3>
+                        
+                        <!-- Botones de Descarga (arriba) -->
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btnDownloadCSV" class="btn-secondary" style="font-size: 14px; padding: 10px 20px;">
+                                💾 Descargar CSV
+                            </button>
+                            <button id="btnDownloadJSON" class="btn-secondary" style="font-size: 14px; padding: 10px 20px;">
+                                📄 Descargar JSON
+                            </button>
+                        </div>
+                    </div>
+    
+                    <!-- Layout: Gráfico + Estadísticas lado a lado -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0;">
+                        
+                        <!-- Gráfico de Pastel -->
+                        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <h4 style="margin: 0 0 20px 0; color: #374151; font-size: 18px; text-align: center;">
+                                📊 Distribución de Sentimientos
+                            </h4>
+                            <canvas id="batchChart" width="300" height="300"></canvas>
+                        </div>
+        
+                        <!-- Estadísticas en Cards -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-content: center;">
+                            <div class="stat-card">
+                                <div class="stat-value" id="batchTotal">0</div>
+                                <div class="stat-label">Total Analizados</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="batchPorcentaje">0%</div>
+                                <div class="stat-label">% Positivos</div>
+                            </div>
+                            <div class="stat-card positive">
+                                <div class="stat-value" id="batchPositivos">0</div>
+                                <div class="stat-label">Positivos</div>
+                            </div>
+                            <div class="stat-card negative">
+                                <div class="stat-value" id="batchNegativos">0</div>
+                                <div class="stat-label">Negativos</div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Mensaje informativo actualizado -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                        <div style="display: flex; align-items: start; gap: 15px;">
+                            <div style="font-size: 32px;">✅</div>
+                            <div>
+                                <h4 style="margin: 0 0 8px 0; color: white; font-size: 16px;">Análisis Completado</h4>
+                                <p id="batchMessage" style="margin: 0; color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6;">
+                                    <!-- El mensaje se generará dinámicamente con JavaScript -->
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Tabla OCULTA (solo para JavaScript) -->
+                    <table id="batchTable" style="display: none;">
+                        <tbody id="batchTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Desarrollado por Angel Luna | Sentiment Analysis API v1.0.0</p>
+            <p class="footer-links">
+                <a href="#" id="linkDocs">📖 Documentación</a>
+                <a href="#" id="linkGithub">🔗 GitHub</a>
+                <a href="#" id="linkAPI">🚀 API Status</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
