@@ -292,11 +292,8 @@ texto
 
 ### 🏠 Pantalla Principal - Análisis Individual
 ```
-<p align="center">
-  <img src="docs/imagenes/demo-analisis.gif" alt="Demo Análisis Individual" width="80%">
-  <br>
-  <i>Análisis de sentimiento en tiempo real con resultado instantáneo</i>
-</p>
+![Demo Análisis Individual](docs/imagenes/demo-analisis.gif)
+
 
 ```
 
