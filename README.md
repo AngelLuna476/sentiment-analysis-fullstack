@@ -343,7 +343,7 @@ texto
   <p><i>Análisis de sentimiento en inglés en tiempo real con resultado instantáneo</i></p>
 </div>
 
----
+<br>
 
 <div align="center">
   <img src="docs/imagenes/demo-multilingue-portugues.gif" alt="Análisis Portugués" width="80%">
