@@ -11,15 +11,14 @@ python-multipart==0.0.6
 pydantic==2.5.3
 pydantic-settings==2.1.0
 
-# Machine Learning (versiones con wheels precompilados)
-scikit-learn>=1.5.0
-joblib>=1.4.0
+# Machine Learning
+scikit-learn==1.4.0
+joblib==1.3.2
+numpy==1.26.3
+pandas==2.1.4
 
 # Traducción
-googletrans==4.0.0-rc1
+deep-translator==1.11.4
 
 # Utilidades
 python-dotenv==1.0.0
-
-# Opcional - Para deployment
-gunicorn==21.2.0
