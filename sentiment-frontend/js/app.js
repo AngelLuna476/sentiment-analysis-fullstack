@@ -1,7 +1,7 @@
 // ============================================
 // CONFIGURACIÓN
 // ============================================
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://sentiment-api-jald-c32.up.railway.app';
 
 // ============================================
 // DATOS DE SESIÓN
