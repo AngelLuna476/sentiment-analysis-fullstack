@@ -3,6 +3,7 @@
 // ============================================
 const API_URL = 'https://sentiment-api-jald-c32.up.railway.app';
 
+
 // ============================================
 // DATOS DE SESIÓN
 // ============================================
@@ -611,42 +612,39 @@ function mostrarResultadoExplicabilidad(resultado) {
     const explainText = document.getElementById('explainText');
     const topWords = document.getElementById('topWords');
     
-    // Validar que palabrasImportantes existe y es un array
-    if (!resultado.palabras_importantes || !Array.isArray(resultado.palabras_importantes)) {
-        console.error('palabras_importantes no es un array válido:', resultado);
-        mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
-        return;
-    }
-
     // Resaltar palabras en el texto
     let textoResaltado = resultado.texto;
     
-    // Ordenar palabras por peso (antes era importancia)
-    const palabrasOrdenadas = [...resultado.palabras_importantes].sort(
-        (a, b) => b.peso - a.peso
-    );
-    
-    // Validar que tengamos palabras para mostrar
-    if (palabrasOrdenadas.length === 0) {
-        mostrarError('No se encontraron palabras influyentes en el texto');
+    // Validar que palabrasImportantes existe y es un array
+    if (!resultado.palabrasImportantes || !Array.isArray(resultado.palabrasImportantes)) {
+        console.warn('palabrasImportantes no es un array válido:', resultado);
+        mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
         return;
     }
     
-    // Resaltar cada palabra en el texto
-    palabrasOrdenadas.forEach(item => {
-        // Validar que el item tenga las propiedades necesarias
-        if (!item.palabra || item.peso === undefined) {
-            console.warn('Item incompleto:', item);
+    // Ordenar palabras por importancia
+    const palabrasOrdenadas = [...resultado.palabrasImportantes].sort(
+        (a, b) => b.importancia - a.importancia
+    );
+    
+    // Resaltar cada palabra
+    palabrasOrdenadas.forEach(palabra => {
+        // Validar que palabra tenga las propiedades necesarias
+        if (!palabra.palabra || palabra.importancia === undefined) {
+            console.warn('Palabra incompleta:', palabra);
             return;
         }
         
-        const regex = new RegExp(`\\b${item.palabra}\\b`, 'gi');
+        const regex = new RegExp(`\\b${palabra.palabra}\\b`, 'gi');
+        // Usar el sentimiento del resultado general, no de la palabra individual
         const clase = resultado.prevision === 'Positivo' ? 'positive' : 'negative';
-        const pesoPercentaje = (typeof item.peso === 'number') ? item.peso * 10 : 0;
+        const importanciaPortcentaje = (typeof palabra.importancia === 'number') 
+            ? palabra.importancia * 10 
+            : 0;
         
         textoResaltado = textoResaltado.replace(
             regex, 
-            `<span class="word-highlight ${clase}" title="Peso: ${pesoPercentaje.toFixed(1)}%">${item.palabra}</span>`
+            `<span class="word-highlight ${clase}" title="Importancia: ${importanciaPortcentaje.toFixed(1)}%">${palabra.palabra}</span>`
         );
     });
     
@@ -658,6 +656,9 @@ function mostrarResultadoExplicabilidad(resultado) {
         return;
     }
     
+    // Limpiar contenido anterior
+    explainContent.innerHTML = '';
+    
     // Construir HTML con los elementos necesarios
     explainContent.innerHTML = `
         <div class="explain-text" id="explainText">
@@ -667,23 +668,30 @@ function mostrarResultadoExplicabilidad(resultado) {
         <div class="top-words">
             <h3>🎯 Palabras más influyentes:</h3>
             <div class="words-grid" id="topWords">
-                ${palabrasOrdenadas.slice(0, 10).map((item, index) => {
+                ${palabrasOrdenadas.map((palabra, index) => {
                     const esPositivo = resultado.prevision === 'Positivo';
-                    const pesoPercentaje = (typeof item.peso === 'number') ? item.peso * 10 : 0;
+                    const importanciaPortcentaje = (typeof palabra.importancia === 'number') 
+                        ? palabra.importancia * 10 
+                        : 0;
                     
                     return `
                         <div class="word-item ${esPositivo ? 'positive' : 'negative'}">
                             <div>
                                 <span style="color: #9ca3af; font-size: 12px;">#${index + 1}</span>
-                                <span class="word-name">${item.palabra}</span>
+                                <span class="word-name">${palabra.palabra}</span>
                             </div>
-                            <span class="word-score">${pesoPercentaje.toFixed(1)}%</span>
+                            <span class="word-score">${importanciaPortcentaje.toFixed(1)}%</span>
                         </div>
                     `;
                 }).join('')}
             </div>
         </div>
-        
+    `;
+    
+    // Agregar info adicional
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'explain-info';
+    infoDiv.innerHTML = `
         <div style="background: #f0f9ff; padding: 15px; border-radius: 10px; margin-top: 20px;">
             <p style="margin-bottom: 10px;"><strong>📊 Resultado:</strong> 
                 <span style="color: ${resultado.prevision === 'Positivo' ? '#10b981' : '#ef4444'}; font-weight: 700;">
@@ -691,13 +699,24 @@ function mostrarResultadoExplicabilidad(resultado) {
                 </span> 
                 (${(resultado.probabilidad * 100).toFixed(2)}%)
             </p>
-            <p style="margin-bottom: 10px;"><strong>🎯 Confianza:</strong> ${resultado.confianza}</p>
             <p><strong>💡 Interpretación:</strong> Las palabras resaltadas son las que más influyeron en la decisión del modelo. 
             Las palabras en <span class="word-highlight positive">verde</span> contribuyen a un sentimiento positivo, 
             mientras que las <span class="word-highlight negative">rojas</span> indican sentimiento negativo.</p>
         </div>
     `;
+    
+    explainContent.appendChild(infoDiv);
 }
+
+// Guardar texto del último análisis
+const analisisOriginal = btnAnalizar.onclick;
+btnAnalizar.addEventListener('click', async function(e) {
+    const texto = comentario.value.trim();
+    if (texto.length >= 3) {
+        ultimoTextoAnalizado = texto;
+    }
+});
+
 
 // ============================================
 // ANÁLISIS BATCH (CSV)
