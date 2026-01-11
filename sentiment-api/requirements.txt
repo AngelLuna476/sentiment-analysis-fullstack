@@ -19,6 +19,7 @@ pandas==2.1.4
 
 # Traducción
 deep-translator==1.11.4
+langdetect==1.0.9
 
 # Utilidades
 python-dotenv==1.0.0
