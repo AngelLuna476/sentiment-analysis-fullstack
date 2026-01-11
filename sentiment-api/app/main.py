@@ -197,6 +197,10 @@ async def analyze_sentiment(request: SentimentRequest):
         raise HTTPException(status_code=500, detail=f"Error al procesar la solicitud: {str(e)}")
 
 
+# ============================================
+# ENDPOINT: EXPLICABILIDAD (CORREGIDO)
+# ============================================
+
 @app.post("/sentiment/explain", tags=["Sentiment Analysis"])
 async def explain_sentiment(request: dict):
     """
@@ -245,12 +249,35 @@ async def explain_sentiment(request: dict):
         
         # Convertir palabras_importantes al formato esperado por el frontend
         palabras_importantes_formateadas = []
+        palabras_positivas = []
+        palabras_negativas = []
+        
         if resultado.palabras_importantes:
             for item in resultado.palabras_importantes:
-                palabras_importantes_formateadas.append({
-                    "palabra": item.get("palabra", ""),
-                    "peso": item.get("importancia", 0.0)
-                })
+                # Acceder a atributos del objeto/dict de forma segura
+                if isinstance(item, dict):
+                    # Si es un diccionario, usar .get()
+                    palabra = item.get('palabra', '')
+                    importancia = item.get('importancia', 0.0)
+                    sentimiento = item.get('sentimiento', 'Neutral')
+                else:
+                    # Si es un objeto Pydantic, acceder por atributos
+                    palabra = getattr(item, 'palabra', '')
+                    importancia = getattr(item, 'importancia', 0.0)
+                    sentimiento = getattr(item, 'sentimiento', 'Neutral')
+                
+                palabra_formateada = {
+                    "palabra": palabra,
+                    "peso": float(importancia)
+                }
+                
+                palabras_importantes_formateadas.append(palabra_formateada)
+                
+                # Separar en positivas y negativas
+                if sentimiento == "Positivo":
+                    palabras_positivas.append(palabra_formateada)
+                elif sentimiento == "Negativo":
+                    palabras_negativas.append(palabra_formateada)
         
         # Construir respuesta compatible
         response = {
@@ -262,16 +289,8 @@ async def explain_sentiment(request: dict):
             "idioma_detectado": resultado.idioma_detectado or idioma,
             "palabras_importantes": palabras_importantes_formateadas,
             "palabras_influyentes": {
-                "positivas": [
-                    p for p in palabras_importantes_formateadas 
-                    if any(item.get("palabra") == p["palabra"] and item.get("sentimiento") == "Positivo" 
-                           for item in resultado.palabras_importantes)
-                ],
-                "negativas": [
-                    p for p in palabras_importantes_formateadas 
-                    if any(item.get("palabra") == p["palabra"] and item.get("sentimiento") == "Negativo" 
-                           for item in resultado.palabras_importantes)
-                ]
+                "positivas": palabras_positivas,
+                "negativas": palabras_negativas
             }
         }
         
@@ -290,7 +309,7 @@ async def explain_sentiment(request: dict):
     
 
 # ============================================
-# ENDPOINT: ANÁLISIS BATCH OPTIMIZADO (CORREGIDO)
+# ENDPOINT: ANÁLISIS BATCH OPTIMIZADO
 # ============================================
 
 @app.post("/sentiment/batch", tags=["Batch Processing"])
