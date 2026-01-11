@@ -53,7 +53,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especificar dominios permitidos
+    allow_origins=["https://sentiment-analysis-jald.vercel.app"],  # En producción, especificar dominios permitidos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
