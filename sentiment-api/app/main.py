@@ -197,10 +197,6 @@ async def analyze_sentiment(request: SentimentRequest):
         raise HTTPException(status_code=500, detail=f"Error al procesar la solicitud: {str(e)}")
 
 
-# ============================================
-# ENDPOINT: EXPLICABILIDAD
-# ============================================
-
 @app.post("/sentiment/explain", tags=["Sentiment Analysis"])
 async def explain_sentiment(request: dict):
     """
@@ -234,41 +230,52 @@ async def explain_sentiment(request: dict):
         
         # Cambiar threshold si es diferente al default
         if threshold != 0.5:
-            predictor.cambiar_threshold(threshold)
+            predictor.configurar_threshold(threshold)
         
         # Determinar si traducir
         traducir = idioma != 'es' and idioma != 'auto'
         
-        # Hacer predicción
-        resultado_pred = predictor.predecir(
+        # Usar la función existente predecir_con_explicacion
+        resultado = predictor.predecir_con_explicacion(
             texto=texto,
+            top_n=top_n,
             traducir=traducir,
-            idioma_origen=idioma if idioma != 'auto' else None
+            idioma_origen=idioma if idioma != 'auto' else 'auto'
         )
         
-        # Obtener explicabilidad
-        explicacion = predictor.explicar_prediccion(
-            texto=resultado_pred.texto,  # Usar el texto (posiblemente traducido)
-            top_n=top_n
-        )
+        # Convertir palabras_importantes al formato esperado por el frontend
+        palabras_importantes_formateadas = []
+        if resultado.palabras_importantes:
+            for item in resultado.palabras_importantes:
+                palabras_importantes_formateadas.append({
+                    "palabra": item.get("palabra", ""),
+                    "peso": item.get("importancia", 0.0)
+                })
         
-        # Construir respuesta
+        # Construir respuesta compatible
         response = {
-            "prevision": resultado_pred.prevision,
-            "probabilidad": float(resultado_pred.probabilidad),
-            "confianza": resultado_pred.confianza,
-            "sentimiento": resultado_pred.prevision,
-            "texto": resultado_pred.texto,
-            "idioma_detectado": resultado_pred.idioma_detectado or idioma,
-            "palabras_importantes": explicacion.get("positivas", []) + explicacion.get("negativas", []),
-            "palabras_influyentes": explicacion  # Formato detallado para frontend moderno
+            "prevision": resultado.prevision,
+            "probabilidad": float(resultado.probabilidad),
+            "confianza": resultado.confianza,
+            "sentimiento": resultado.sentimiento,
+            "texto": resultado.texto,
+            "idioma_detectado": resultado.idioma_detectado or idioma,
+            "palabras_importantes": palabras_importantes_formateadas,
+            "palabras_influyentes": {
+                "positivas": [
+                    p for p in palabras_importantes_formateadas 
+                    if any(item.get("palabra") == p["palabra"] and item.get("sentimiento") == "Positivo" 
+                           for item in resultado.palabras_importantes)
+                ],
+                "negativas": [
+                    p for p in palabras_importantes_formateadas 
+                    if any(item.get("palabra") == p["palabra"] and item.get("sentimiento") == "Negativo" 
+                           for item in resultado.palabras_importantes)
+                ]
+            }
         }
         
-        # Si había texto original (traducido)
-        if resultado_pred.texto_original and resultado_pred.texto_original != resultado_pred.texto:
-            response["texto_original"] = resultado_pred.texto_original
-        
-        logger.info(f"✅ Explicabilidad generada: {len(explicacion.get('positivas', []))} positivas, {len(explicacion.get('negativas', []))} negativas")
+        logger.info(f"✅ Explicabilidad generada: {len(palabras_importantes_formateadas)} palabras")
         
         return response
         
