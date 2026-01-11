@@ -616,14 +616,21 @@ function mostrarResultadoExplicabilidad(resultado) {
     // Resaltar palabras en el texto
     let textoResaltado = resultado.texto;
     
-    // Adaptar estructura si viene con 'peso' en lugar de 'importancia'
-    let palabrasArray = Array.isArray(resultado.palabrasImportantes)
-      ? resultado.palabrasImportantes.map(p => ({
-          palabra: p.palabra,
-          importancia: p.importancia ?? p.peso ?? 0
-        }))
-      : [];
-    
+    // Adaptar estructura: aceptar array o objeto con índices numéricos
+    let palabrasArray = [];
+    if (Array.isArray(resultado.palabrasImportantes)) {
+        palabrasArray = resultado.palabrasImportantes.map(p => ({
+            palabra: p.palabra,
+            importancia: p.importancia ?? p.peso ?? 0
+        }));
+    } else if (typeof resultado.palabrasImportantes === 'object' && resultado.palabrasImportantes !== null) {
+        palabrasArray = Object.values(resultado.palabrasImportantes).map(p => ({
+            palabra: p.palabra,
+            importancia: p.importancia ?? p.peso ?? 0
+        }));
+    }
+
+    // Validar que haya datos
     if (palabrasArray.length === 0) {
         console.warn('palabrasImportantes no es un array válido:', resultado);
         mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
@@ -635,7 +642,7 @@ function mostrarResultadoExplicabilidad(resultado) {
         (a, b) => b.importancia - a.importancia
     );
     
-    // Resaltar cada palabra
+    // Resaltar cada palabra en el texto
     palabrasOrdenadas.forEach(palabra => {
         if (!palabra.palabra || palabra.importancia === undefined) {
             console.warn('Palabra incompleta:', palabra);
@@ -661,8 +668,10 @@ function mostrarResultadoExplicabilidad(resultado) {
         return;
     }
     
+    // Limpiar contenido anterior
     explainContent.innerHTML = '';
     
+    // Construir HTML con los elementos necesarios
     explainContent.innerHTML = `
         <div class="explain-text" id="explainText">
             ${textoResaltado}
@@ -691,6 +700,7 @@ function mostrarResultadoExplicabilidad(resultado) {
         </div>
     `;
     
+    // Agregar info adicional
     const infoDiv = document.createElement('div');
     infoDiv.className = 'explain-info';
     infoDiv.innerHTML = `
@@ -709,6 +719,7 @@ function mostrarResultadoExplicabilidad(resultado) {
     
     explainContent.appendChild(infoDiv);
 }
+
 
 // Guardar texto del último análisis
 const analisisOriginal = btnAnalizar.onclick;
