@@ -535,6 +535,7 @@ document.getElementById('linkAPI').addEventListener('click', (e) => {
     window.open('http://localhost:8080/api/health', '_blank');
 });
 
+
 // ============================================
 // EXPLICABILIDAD
 // ============================================
@@ -615,28 +616,33 @@ function mostrarResultadoExplicabilidad(resultado) {
     // Resaltar palabras en el texto
     let textoResaltado = resultado.texto;
     
-    // Validar que palabrasImportantes existe y es un array
-    if (!resultado.palabrasImportantes || !Array.isArray(resultado.palabrasImportantes)) {
+    // Adaptar estructura si viene con 'peso' en lugar de 'importancia'
+    let palabrasArray = Array.isArray(resultado.palabrasImportantes)
+      ? resultado.palabrasImportantes.map(p => ({
+          palabra: p.palabra,
+          importancia: p.importancia ?? p.peso ?? 0
+        }))
+      : [];
+    
+    if (palabrasArray.length === 0) {
         console.warn('palabrasImportantes no es un array válido:', resultado);
         mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
         return;
     }
     
     // Ordenar palabras por importancia
-    const palabrasOrdenadas = [...resultado.palabrasImportantes].sort(
+    const palabrasOrdenadas = [...palabrasArray].sort(
         (a, b) => b.importancia - a.importancia
     );
     
     // Resaltar cada palabra
     palabrasOrdenadas.forEach(palabra => {
-        // Validar que palabra tenga las propiedades necesarias
         if (!palabra.palabra || palabra.importancia === undefined) {
             console.warn('Palabra incompleta:', palabra);
             return;
         }
         
         const regex = new RegExp(`\\b${palabra.palabra}\\b`, 'gi');
-        // Usar el sentimiento del resultado general, no de la palabra individual
         const clase = resultado.prevision === 'Positivo' ? 'positive' : 'negative';
         const importanciaPortcentaje = (typeof palabra.importancia === 'number') 
             ? palabra.importancia * 10 
@@ -648,7 +654,6 @@ function mostrarResultadoExplicabilidad(resultado) {
         );
     });
     
-    // Obtener contenedor principal
     const explainContent = document.getElementById('explainContent');
     if (!explainContent) {
         console.error('Elemento explainContent no encontrado');
@@ -656,10 +661,8 @@ function mostrarResultadoExplicabilidad(resultado) {
         return;
     }
     
-    // Limpiar contenido anterior
     explainContent.innerHTML = '';
     
-    // Construir HTML con los elementos necesarios
     explainContent.innerHTML = `
         <div class="explain-text" id="explainText">
             ${textoResaltado}
@@ -688,7 +691,6 @@ function mostrarResultadoExplicabilidad(resultado) {
         </div>
     `;
     
-    // Agregar info adicional
     const infoDiv = document.createElement('div');
     infoDiv.className = 'explain-info';
     infoDiv.innerHTML = `
@@ -716,6 +718,7 @@ btnAnalizar.addEventListener('click', async function(e) {
         ultimoTextoAnalizado = texto;
     }
 });
+
 
 
 // ============================================
