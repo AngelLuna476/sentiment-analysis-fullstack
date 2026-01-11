@@ -198,44 +198,88 @@ async def analyze_sentiment(request: SentimentRequest):
 
 
 # ============================================
-# ENDPOINT: PREDICCIÓN CON EXPLICABILIDAD
+# ENDPOINT: EXPLICABILIDAD
 # ============================================
 
-@app.post("/sentiment/explain", response_model=SentimentExplainResponse, tags=["Sentiment Analysis"])
-async def analyze_sentiment_with_explanation(request: SentimentExplainRequest):
+@app.post("/sentiment/explain", tags=["Sentiment Analysis"])
+async def explain_sentiment(request: dict):
     """
-    Analizar el sentimiento con explicación de palabras influyentes.
+    Explica la predicción de sentimiento mostrando las palabras más influyentes.
     
-    - **text**: Texto a analizar
-    - **idioma**: Código del idioma
-    - **top_n**: Número de palabras más influyentes a retornar (1-20)
+    Body:
+        - text (str): Texto a analizar
+        - idioma (str, opcional): Código de idioma ('es', 'en', 'pt', 'auto')
+        - threshold (float, opcional): Umbral de clasificación
+        - top_n (int, opcional): Número de palabras a mostrar (default: 10)
     
     Returns:
-        Predicción con lista de palabras más importantes
+        Diccionario con predicción y palabras influyentes
     """
     try:
+        # Validar request
+        texto = request.get("text", "").strip()
+        if not texto:
+            raise HTTPException(status_code=400, detail="El campo 'text' es requerido y no puede estar vacío")
+        
+        idioma = request.get("idioma", "auto")
+        threshold = request.get("threshold", 0.5)
+        top_n = request.get("top_n", 10)
+        
+        # Validar threshold
+        if not 0 <= threshold <= 1:
+            raise HTTPException(status_code=400, detail="El threshold debe estar entre 0 y 1")
+        
+        # Obtener predictor
         predictor = obtener_predictor()
         
-        # Determinar si necesita traducción
-        traducir = request.idioma != 'es'
+        # Cambiar threshold si es diferente al default
+        if threshold != 0.5:
+            predictor.cambiar_threshold(threshold)
         
-        # Realizar predicción con explicación
-        resultado = predictor.predecir_con_explicacion(
-            texto=request.text,
-            top_n=request.top_n,
+        # Determinar si traducir
+        traducir = idioma != 'es' and idioma != 'auto'
+        
+        # Hacer predicción
+        resultado_pred = predictor.predecir(
+            texto=texto,
             traducir=traducir,
-            idioma_origen=request.idioma
+            idioma_origen=idioma if idioma != 'auto' else None
         )
         
-        logger.info(f"Predicción con explicación exitosa: {resultado.prevision}")
+        # Obtener explicabilidad
+        explicacion = predictor.explicar_prediccion(
+            texto=resultado_pred.texto,  # Usar el texto (posiblemente traducido)
+            top_n=top_n
+        )
         
-        return resultado
+        # Construir respuesta
+        response = {
+            "prevision": resultado_pred.prevision,
+            "probabilidad": float(resultado_pred.probabilidad),
+            "confianza": resultado_pred.confianza,
+            "sentimiento": resultado_pred.prevision,
+            "texto": resultado_pred.texto,
+            "idioma_detectado": resultado_pred.idioma_detectado or idioma,
+            "palabras_importantes": explicacion.get("positivas", []) + explicacion.get("negativas", []),
+            "palabras_influyentes": explicacion  # Formato detallado para frontend moderno
+        }
         
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        # Si había texto original (traducido)
+        if resultado_pred.texto_original and resultado_pred.texto_original != resultado_pred.texto:
+            response["texto_original"] = resultado_pred.texto_original
+        
+        logger.info(f"✅ Explicabilidad generada: {len(explicacion.get('positivas', []))} positivas, {len(explicacion.get('negativas', []))} negativas")
+        
+        return response
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error en predicción con explicación: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"❌ Error en explain_sentiment: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error procesando explicabilidad: {str(e)}"
+        )
     
 
 # ============================================
