@@ -615,10 +615,8 @@ function mostrarResultadoExplicabilidad(resultado) {
     let textoResaltado = resultado.texto;
     
     // Validar que palabrasImportantes existe y es un array
-    const palabras = resultado.palabrasImportantes || resultado.palabras_importantes;
-
-    if (!palabras || !Array.isArray(palabras)) {
-        console.warn('palabras_importantes no es un array válido:', resultado);
+    if (!resultado.palabrasImportantes || !Array.isArray(resultado.palabrasImportantes)) {
+        console.warn('palabrasImportantes no es un array válido:', resultado);
         mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
         return;
     }
