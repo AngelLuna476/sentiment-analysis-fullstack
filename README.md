@@ -502,9 +502,20 @@ Si encuentras un bug, por favor [abre un issue](https://github.com/AngelLuna476/
 
 ---
 
-## 📄 Licencia
+## 📜 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está bajo la licencia **MIT**.  
+Puedes usar, modificar y distribuir el código libremente, siempre y cuando mantengas el aviso de copyright y la licencia original.
+
+**Atribución requerida:**  
+Por favor, da crédito a **Angel Luna** al utilizar este repositorio o cualquier derivado del mismo.  
+Ejemplo de cita:
+
+> Proyecto original: [sentiment-analysis-fullstack](https://github.com/AngelLuna476/sentiment-analysis-fullstack)  
+> Autor: Angel Luna (MIT License, 2026)
+
+El software se proporciona "tal cual", sin garantías de ningún tipo.
+
 
 ---
 
