@@ -630,12 +630,7 @@ function mostrarResultadoExplicabilidad(resultado) {
         }));
     }
 
-    // Validar que haya datos
-    if (palabrasArray.length === 0) {
-        console.warn('palabrasImportantes no es un array válido:', resultado);
-        mostrarError('Error: La respuesta no contiene datos de palabras importantes válidos');
-        return;
-    }
+    
     
     // Ordenar palabras por importancia
     const palabrasOrdenadas = [...palabrasArray].sort(
