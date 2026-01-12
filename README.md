@@ -12,7 +12,7 @@
 <br>
 _Propuesta personal de solución desarrollada para el Hackathon ONE II - Latam_
 
-[🌐 Demo en Vivo](sentiment-analysis-jald.vercel.app/) | [📚 Documentación](#-instalación) | [🐛 Reportar Bug](https://github.com/AngelLuna476/sentiment-analysis-fullstack/issues)
+[🌐 Demo en Vivo](https://sentiment-analysis-jald.vercel.app/) | [📚 Documentación](#-instalación) | [🐛 Reportar Bug](https://github.com/AngelLuna476/sentiment-analysis-fullstack/issues)
 
 </div>
 
