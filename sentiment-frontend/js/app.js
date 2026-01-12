@@ -521,17 +521,17 @@ document.getElementById('btnCerrarError').addEventListener('click', ocultarError
 // ============================================
 document.getElementById('linkDocs').addEventListener('click', (e) => {
     e.preventDefault();
-    window.open('http://localhost:8000/docs', '_blank');
+    window.open('https://sentiment-api-jald-c32.up.railway.app/docs', '_blank');
 });
 
 document.getElementById('linkGithub').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('🔗 Link de GitHub próximamente...');
+    window.open('https://github.com/AngelLuna476/sentiment-analysis-fullstack', '_blank');
 });
 
 document.getElementById('linkAPI').addEventListener('click', (e) => {
     e.preventDefault();
-    window.open('http://localhost:8080/api/health', '_blank');
+    window.open('https://sentiment-api-jald-c32.up.railway.app/health', '_blank');
 });
 
 // ============================================
