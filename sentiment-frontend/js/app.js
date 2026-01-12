@@ -81,6 +81,7 @@ function cambiarSeccion(nombreSeccion) {
     const btn = document.querySelector(`.nav-btn[data-section="${nombreSeccion}"]`);
     if (btn) btn.click();
 }
+
 document.addEventListener("DOMContentLoaded", () => {
     const tipoAnalisis = document.getElementById("tipoAnalisis");
 
@@ -93,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
 
 // ============================================
 // INICIALIZACIÓN
@@ -507,7 +507,6 @@ function mostrarLoader(mostrar) {
 // ============================================
 // BOTONES DE ACCIÓN
 // ============================================
-
 document.getElementById('btnDescartar').addEventListener('click', () => {
     ocultarResultado();
     comentario.value = '';
@@ -534,7 +533,6 @@ document.getElementById('linkAPI').addEventListener('click', (e) => {
     e.preventDefault();
     window.open('http://localhost:8080/api/health', '_blank');
 });
-
 
 // ============================================
 // EXPLICABILIDAD
@@ -608,65 +606,87 @@ async function mostrarExplicabilidad(texto) {
     }
 }
 
-// Función para mostrar resultado de explicabilidad
+// Función para mostrar resultado de explicabilidad (CORREGIDA)
 function mostrarResultadoExplicabilidad(resultado) {
-    const explainText = document.getElementById('explainText');
-    const topWords = document.getElementById('topWords');
-    
-    // Resaltar palabras en el texto
-    let textoResaltado = resultado.texto;
-    
-    // Adaptar estructura: aceptar array o objeto con índices numéricos
-    let palabrasArray = [];
-    if (Array.isArray(resultado.palabrasImportantes)) {
-        palabrasArray = resultado.palabrasImportantes.map(p => ({
-            palabra: p.palabra,
-            importancia: p.importancia ?? p.peso ?? 0
-        }));
-    } else if (typeof resultado.palabrasImportantes === 'object' && resultado.palabrasImportantes !== null) {
-        palabrasArray = Object.values(resultado.palabrasImportantes).map(p => ({
-            palabra: p.palabra,
-            importancia: p.importancia ?? p.peso ?? 0
-        }));
-    }
-
-    
-    
-    // Ordenar palabras por importancia
-    const palabrasOrdenadas = [...palabrasArray].sort(
-        (a, b) => b.importancia - a.importancia
-    );
-    
-    // Resaltar cada palabra en el texto
-    palabrasOrdenadas.forEach(palabra => {
-        if (!palabra.palabra || palabra.importancia === undefined) {
-            console.warn('Palabra incompleta:', palabra);
-            return;
-        }
-        
-        const regex = new RegExp(`\\b${palabra.palabra}\\b`, 'gi');
-        const clase = resultado.prevision === 'Positivo' ? 'positive' : 'negative';
-        const importanciaPortcentaje = (typeof palabra.importancia === 'number') 
-            ? palabra.importancia * 10 
-            : 0;
-        
-        textoResaltado = textoResaltado.replace(
-            regex, 
-            `<span class="word-highlight ${clase}" title="Importancia: ${importanciaPortcentaje.toFixed(1)}%">${palabra.palabra}</span>`
-        );
-    });
-    
     const explainContent = document.getElementById('explainContent');
     if (!explainContent) {
         console.error('Elemento explainContent no encontrado');
         mostrarError('Error: No se puede mostrar explicabilidad');
         return;
     }
-    
-    // Limpiar contenido anterior
-    explainContent.innerHTML = '';
-    
-    // Construir HTML con los elementos necesarios
+
+    // 1) Unificar origen de palabras: palabrasImportantes / palabras_importantes / palabras_influyentes
+    let palabrasArray = [];
+
+    // a) API actual (snake_case)
+    if (Array.isArray(resultado.palabras_importantes)) {
+        palabrasArray = resultado.palabras_importantes.map(p => ({
+            palabra: p.palabra,
+            importancia: p.importancia ?? p.peso ?? 0
+        }));
+    } else if (resultado.palabras_influyentes && typeof resultado.palabras_influyentes === 'object') {
+        const positivas = Array.isArray(resultado.palabras_influyentes.positivas)
+            ? resultado.palabras_influyentes.positivas
+            : [];
+        const negativas = Array.isArray(resultado.palabras_influyentes.negativas)
+            ? resultado.palabras_influyentes.negativas
+            : [];
+
+        palabrasArray = [...positivas, ...negativas].map(p => ({
+            palabra: p.palabra,
+            importancia: p.importancia ?? p.peso ?? 0
+        }));
+    }
+    // b) Compatibilidad con versión camelCase
+    else {
+        const origenPalabras = resultado.palabrasImportantes || resultado.palabras_importantes;
+        if (Array.isArray(origenPalabras)) {
+            palabrasArray = origenPalabras.map(p => ({
+                palabra: p.palabra,
+                importancia: p.importancia ?? p.peso ?? 0
+            }));
+        } else if (typeof origenPalabras === 'object' && origenPalabras !== null) {
+            palabrasArray = Object.values(origenPalabras).map(p => ({
+                palabra: p.palabra,
+                importancia: p.importancia ?? p.peso ?? 0
+            }));
+        }
+    }
+
+    if (!palabrasArray || palabrasArray.length === 0) {
+        explainContent.innerHTML = `
+            <p style="padding: 20px; text-align: center;">
+                No se encontraron palabras influyentes en la respuesta del modelo.
+            </p>
+        `;
+        return;
+    }
+
+    // 2) Ordenar por importancia
+    const palabrasOrdenadas = [...palabrasArray].sort(
+        (a, b) => (b.importancia || 0) - (a.importancia || 0)
+    );
+
+    // 3) Construir texto resaltado (sin \\b)
+    let textoResaltado = resultado.texto || '';
+    palabrasOrdenadas.forEach(palabra => {
+        if (!palabra.palabra) return;
+
+        const importanciaPortcentaje = typeof palabra.importancia === 'number'
+            ? palabra.importancia * 10
+            : 0;
+
+        const escaped = palabra.palabra.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+        const clase = resultado.prevision === 'Positivo' ? 'positive' : 'negative';
+
+        textoResaltado = textoResaltado.replace(
+            regex,
+            `<span class="word-highlight ${clase}" title="Importancia: ${importanciaPortcentaje.toFixed(1)}%">${palabra.palabra}</span>`
+        );
+    });
+
+    // 4) Pintar HTML principal
     explainContent.innerHTML = `
         <div class="explain-text" id="explainText">
             ${textoResaltado}
@@ -677,10 +697,10 @@ function mostrarResultadoExplicabilidad(resultado) {
             <div class="words-grid" id="topWords">
                 ${palabrasOrdenadas.map((palabra, index) => {
                     const esPositivo = resultado.prevision === 'Positivo';
-                    const importanciaPortcentaje = (typeof palabra.importancia === 'number') 
-                        ? palabra.importancia * 10 
+                    const importanciaPortcentaje = typeof palabra.importancia === 'number'
+                        ? palabra.importancia * 10
                         : 0;
-                    
+
                     return `
                         <div class="word-item ${esPositivo ? 'positive' : 'negative'}">
                             <div>
@@ -694,8 +714,8 @@ function mostrarResultadoExplicabilidad(resultado) {
             </div>
         </div>
     `;
-    
-    // Agregar info adicional
+
+    // 5) Info adicional
     const infoDiv = document.createElement('div');
     infoDiv.className = 'explain-info';
     infoDiv.innerHTML = `
@@ -711,21 +731,17 @@ function mostrarResultadoExplicabilidad(resultado) {
             mientras que las <span class="word-highlight negative">rojas</span> indican sentimiento negativo.</p>
         </div>
     `;
-    
+
     explainContent.appendChild(infoDiv);
 }
 
-
 // Guardar texto del último análisis
-const analisisOriginal = btnAnalizar.onclick;
-btnAnalizar.addEventListener('click', async function(e) {
+btnAnalizar.addEventListener('click', function() {
     const texto = comentario.value.trim();
     if (texto.length >= 3) {
         ultimoTextoAnalizado = texto;
     }
 });
-
-
 
 // ============================================
 // ANÁLISIS BATCH (CSV)
@@ -1066,17 +1082,16 @@ function dibujarGraficoBatch(positivos, negativos, porcentajePositivos) {
     
     if (negativos > 0) {
         const negAngle = -Math.PI / 2 + positivosAngle + ((2 * Math.PI - positivosAngle) / 2);
-        const negX = centerX + Math.cos(negAngle) * (radius * 0.82); // ← Cambié 0.75 a 0.85
-        const negY = centerY + Math.sin(negAngle) * (radius * 0.82); // ← Cambié 0.75 a 0.85
+        const negX = centerX + Math.cos(negAngle) * (radius * 0.82);
+        const negY = centerY + Math.sin(negAngle) * (radius * 0.82);
     
         ctx.fillStyle = 'white';
         ctx.font = 'bold 16px Arial'; 
         ctx.fillText(`${(100 - porcentajePositivos).toFixed(1)}%`, negX, negY);
-        ctx.font = 'bold 14px Arial'; // 
+        ctx.font = 'bold 14px Arial';
         ctx.fillText(`${negativos}`, negX, negY + 18); 
     }
 }
-
 
 // Descargar resultados como CSV
 document.getElementById('btnDownloadCSV').addEventListener('click', () => {
@@ -1133,10 +1148,10 @@ function descargarArchivo(contenido, nombreArchivo, tipoMIME) {
     window.URL.revokeObjectURL(url);
 }
 
-
 // ============================================
 // ATAJO: Ctrl + Enter
 // ============================================
 comentario.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 'Enter') btnAnalizar.click();
 });
+
