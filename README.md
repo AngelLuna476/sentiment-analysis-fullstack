@@ -523,8 +523,8 @@ El software se proporciona "tal cual", sin garantías de ningún tipo.
 
 **[José Ángel Luna Delgado]**
 
-- 🌐 Portfolio: [https://angelluna476.github.io/Angel_Luna_portfolio_cv_web/](#)
-- 💼 LinkedIn: [www.linkedin.com/in/angel-luna468213795](#)
+- 🌐 [Portfolio](https://angelluna476.github.io/Angel_Luna_portfolio_cv_web/)
+- 💼 [LinkedIn](https://www.linkedin.com/in/angel-luna468213795)
 - 🐙 GitHub: [@AngelLuna476](https://github.com/AngelLuna476)
 
 ---
